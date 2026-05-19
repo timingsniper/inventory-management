@@ -130,6 +130,16 @@ export const api = {
     return response.data;
   },
 
+  async getReportsQuarterly() {
+    const response = await axios.get(`${API_BASE_URL}/reports/quarterly`);
+    return response.data;
+  },
+
+  async getReportsMonthlyTrends() {
+    const response = await axios.get(`${API_BASE_URL}/reports/monthly-trends`);
+    return response.data;
+  },
+
   async getSuppliers(filters = {}, includeInactive) {
     const params = new URLSearchParams();
     if (filters.warehouse && filters.warehouse !== "all") {
