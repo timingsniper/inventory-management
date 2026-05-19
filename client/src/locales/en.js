@@ -6,6 +6,7 @@ export default {
     orders: "Orders",
     finance: "Finance",
     demandForecast: "Demand Forecast",
+    reports: "Reports",
     restocking: "Restocking",
     companyName: "Catalyst Components",
     subtitle: "Inventory Management System",
@@ -334,6 +335,33 @@ export default {
       qtyToOrder: "Qty to Order",
       unitCost: "Unit Cost",
       subtotal: "Subtotal",
+    },
+  },
+
+  // Reports
+  reports: {
+    title: "Performance Reports",
+    subtitle: "View quarterly performance metrics and monthly trends",
+    quarterlyPerformance: "Quarterly Performance",
+    monthlyRevenueTrend: "Monthly Revenue Trend",
+    monthOverMonthAnalysis: "Month-over-Month Analysis",
+    table: {
+      quarter: "Quarter",
+      totalOrders: "Total Orders",
+      totalRevenue: "Total Revenue",
+      avgOrderValue: "Avg Order Value",
+      fulfillmentRate: "Fulfillment Rate",
+      month: "Month",
+      orders: "Orders",
+      revenue: "Revenue",
+      change: "Change",
+      growthRate: "Growth Rate",
+    },
+    stats: {
+      totalRevenueYTD: "Total Revenue (YTD)",
+      avgMonthlyRevenue: "Avg Monthly Revenue",
+      totalOrdersYTD: "Total Orders (YTD)",
+      bestQuarter: "Best Performing Quarter",
     },
   },
 

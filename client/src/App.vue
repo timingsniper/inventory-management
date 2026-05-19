@@ -38,7 +38,7 @@
             to="/reports"
             :class="{ active: $route.path === '/reports' }"
           >
-            Reports
+            {{ t("nav.reports") }}
           </router-link>
           <router-link
             to="/restocking"
