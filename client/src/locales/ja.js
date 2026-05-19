@@ -313,6 +313,8 @@ export default {
   language: {
     english: "English",
     japanese: "日本語",
+    simplifiedChinese: "簡体字中国語",
+    korean: "韓国語",
     selectLanguage: "言語を選択",
   },
 

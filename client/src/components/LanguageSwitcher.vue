@@ -86,6 +86,8 @@ const isDropdownOpen = ref(false);
 const languageNames = {
   en: "English",
   ja: "日本語",
+  zh: "简体中文",
+  ko: "한국어",
 };
 
 const getLanguageName = (locale) => {
