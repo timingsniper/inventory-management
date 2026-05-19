@@ -41,6 +41,12 @@
             {{ t("nav.reports") }}
           </router-link>
           <router-link
+            to="/backlog"
+            :class="{ active: $route.path === '/backlog' }"
+          >
+            {{ t("nav.backlog") }}
+          </router-link>
+          <router-link
             to="/restocking"
             :class="{ active: $route.path === '/restocking' }"
           >
