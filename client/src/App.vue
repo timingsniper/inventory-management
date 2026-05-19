@@ -48,6 +48,7 @@
           </router-link>
         </nav>
         <LanguageSwitcher />
+        <DarkModeToggle />
         <ProfileMenu
           @show-profile-details="showProfileDetails = true"
           @show-tasks="showTasks = true"
@@ -80,11 +81,13 @@ import { ref, onMounted, computed } from "vue";
 import { api } from "./api";
 import { useAuth } from "./composables/useAuth";
 import { useI18n } from "./composables/useI18n";
+import { useDarkMode } from "./composables/useDarkMode";
 import FilterBar from "./components/FilterBar.vue";
 import ProfileMenu from "./components/ProfileMenu.vue";
 import ProfileDetailsModal from "./components/ProfileDetailsModal.vue";
 import TasksModal from "./components/TasksModal.vue";
 import LanguageSwitcher from "./components/LanguageSwitcher.vue";
+import DarkModeToggle from "./components/DarkModeToggle.vue";
 
 export default {
   name: "App",
@@ -94,8 +97,10 @@ export default {
     ProfileDetailsModal,
     TasksModal,
     LanguageSwitcher,
+    DarkModeToggle,
   },
   setup() {
+    useDarkMode(); // initializes dark class on <html> and persists preference
     const { currentUser } = useAuth();
     const { t } = useI18n();
     const showProfileDetails = ref(false);
@@ -186,6 +191,40 @@ export default {
 </script>
 
 <style>
+:root {
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f8fafc;
+  --bg-surface-2: #f1f5f9;
+  --border-color: #e2e8f0;
+  --border-color-2: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-body: #334155;
+  --text-muted: #475569;
+  --nav-active-bg: #eff6ff;
+  --nav-active-color: #2563eb;
+  --shadow-sm: rgba(0, 0, 0, 0.05);
+  --shadow-md: rgba(0, 0, 0, 0.06);
+}
+
+html.dark {
+  --bg-page: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-surface-hover: #263044;
+  --bg-surface-2: #263044;
+  --border-color: #334155;
+  --border-color-2: #475569;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-body: #cbd5e1;
+  --text-muted: #94a3b8;
+  --nav-active-bg: #1e3a5f;
+  --nav-active-color: #60a5fa;
+  --shadow-sm: rgba(0, 0, 0, 0.2);
+  --shadow-md: rgba(0, 0, 0, 0.3);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -203,8 +242,8 @@ body {
     Ubuntu,
     Cantarell,
     sans-serif;
-  background: #f8fafc;
-  color: #1e293b;
+  background: var(--bg-page);
+  color: var(--text-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -216,9 +255,9 @@ body {
 }
 
 .top-nav {
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px 0 var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -242,6 +281,10 @@ body {
   margin-right: 1rem;
 }
 
+.nav-container > .dark-mode-toggle {
+  margin-right: 1rem;
+}
+
 .logo {
   display: flex;
   align-items: baseline;
@@ -251,16 +294,16 @@ body {
 .logo h1 {
   font-size: 1.375rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
   letter-spacing: -0.025em;
 }
 
 .subtitle {
   font-size: 0.813rem;
-  color: #64748b;
+  color: var(--text-secondary);
   font-weight: 400;
   padding-left: 0.75rem;
-  border-left: 1px solid #e2e8f0;
+  border-left: 1px solid var(--border-color);
 }
 
 .nav-tabs {
@@ -270,7 +313,7 @@ body {
 
 .nav-tabs a {
   padding: 0.625rem 1.25rem;
-  color: #64748b;
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.938rem;
@@ -280,13 +323,13 @@ body {
 }
 
 .nav-tabs a:hover {
-  color: #0f172a;
-  background: #f1f5f9;
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
 }
 
 .nav-tabs a.active {
-  color: #2563eb;
-  background: #eff6ff;
+  color: var(--nav-active-color);
+  background: var(--nav-active-bg);
 }
 
 .nav-tabs a.active::after {
@@ -296,7 +339,7 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: #2563eb;
+  background: var(--nav-active-color);
 }
 
 .main-content {
@@ -314,13 +357,13 @@ body {
 .page-header h2 {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
   margin-bottom: 0.375rem;
   letter-spacing: -0.025em;
 }
 
 .page-header p {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.938rem;
 }
 
@@ -332,20 +375,20 @@ body {
 }
 
 .stat-card {
-  background: white;
+  background: var(--bg-surface);
   padding: 1.25rem;
   border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   transition: all 0.2s ease;
 }
 
 .stat-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: var(--border-color-2);
+  box-shadow: 0 4px 12px var(--shadow-md);
 }
 
 .stat-label {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -356,7 +399,7 @@ body {
 .stat-value {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
   letter-spacing: -0.025em;
 }
 
@@ -377,10 +420,10 @@ body {
 }
 
 .card {
-  background: white;
+  background: var(--bg-surface);
   border-radius: 10px;
   padding: 1.25rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   margin-bottom: 1.25rem;
 }
 
@@ -390,13 +433,13 @@ body {
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.875rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .card-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
   letter-spacing: -0.025em;
 }
 
@@ -410,16 +453,16 @@ table {
 }
 
 thead {
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--bg-page);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 th {
   text-align: left;
   padding: 0.5rem 0.75rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-muted);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -427,8 +470,8 @@ th {
 
 td {
   padding: 0.5rem 0.75rem;
-  border-top: 1px solid #f1f5f9;
-  color: #334155;
+  border-top: 1px solid var(--bg-surface-2);
+  color: var(--text-body);
   font-size: 0.875rem;
 }
 
@@ -437,7 +480,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background: #f8fafc;
+  background: var(--bg-surface-hover);
 }
 
 .badge {
@@ -503,7 +546,7 @@ tbody tr:hover {
 .loading {
   text-align: center;
   padding: 3rem;
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.938rem;
 }
 
