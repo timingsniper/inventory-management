@@ -89,6 +89,7 @@ class DemandForecast(BaseModel):
     forecasted_demand: int
     trend: str
     period: str
+    unit_cost: float
 
 class BacklogItem(BaseModel):
     id: str
@@ -119,6 +120,32 @@ class CreatePurchaseOrderRequest(BaseModel):
     unit_cost: float
     expected_delivery_date: str
     notes: Optional[str] = None
+
+class Task(BaseModel):
+    id: str
+    title: str
+    priority: str
+    dueDate: str
+    status: str
+
+class CreateTaskRequest(BaseModel):
+    title: str
+    priority: str
+    dueDate: str
+
+class OrderItem(BaseModel):
+    sku: str
+    name: str
+    quantity: int
+    unit_price: float
+
+class CreateOrderRequest(BaseModel):
+    customer: str
+    items: List[OrderItem]
+    warehouse: str
+    category: str
+    order_date: str
+    expected_delivery: str
 
 # API endpoints
 @app.get("/")
@@ -160,6 +187,96 @@ def get_order(order_id: str):
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
+
+@app.post("/api/orders", response_model=Order, status_code=201)
+def create_order(request: CreateOrderRequest):
+    # RST- prefix distinguishes restocking orders from ORD- customer orders
+    year = request.order_date[:4] if request.order_date else "2026"
+    seq = str(len(orders) + 1).zfill(4)
+    order_number = f"RST-{year}-{seq}"
+
+    total_value = round(
+        sum(item.quantity * item.unit_price for item in request.items), 2
+    )
+
+    new_order = {
+        "id": str(len(orders) + 1),
+        "order_number": order_number,
+        "customer": request.customer,
+        "items": [item.dict() for item in request.items],
+        "status": "Processing",
+        "warehouse": request.warehouse,
+        "category": request.category,
+        "order_date": request.order_date,
+        "expected_delivery": request.expected_delivery,
+        "total_value": total_value,
+    }
+
+    orders.append(new_order)
+    return new_order
+
+# In-memory task store (starts empty; not persisted across restarts)
+tasks = []
+
+@app.get("/api/tasks", response_model=List[Task])
+def get_tasks():
+    return tasks
+
+@app.post("/api/tasks", response_model=Task, status_code=201)
+def create_task(request: CreateTaskRequest):
+    new_task = {
+        "id": str(len(tasks) + 1),
+        "title": request.title,
+        "priority": request.priority,
+        "dueDate": request.dueDate,
+        "status": "pending",
+    }
+    tasks.append(new_task)
+    return new_task
+
+@app.delete("/api/tasks/{task_id}", status_code=204)
+def delete_task(task_id: str):
+    task = next((t for t in tasks if t["id"] == task_id), None)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    tasks.remove(task)
+
+@app.patch("/api/tasks/{task_id}", response_model=Task)
+def toggle_task(task_id: str):
+    task = next((t for t in tasks if t["id"] == task_id), None)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    # Toggle between pending and completed
+    task["status"] = "completed" if task["status"] == "pending" else "pending"
+    return task
+
+@app.get("/api/purchase-orders/{backlog_item_id}", response_model=PurchaseOrder)
+def get_purchase_order_by_backlog_item(backlog_item_id: str):
+    po = next((po for po in purchase_orders if po["backlog_item_id"] == backlog_item_id), None)
+    if not po:
+        raise HTTPException(status_code=404, detail="Purchase order not found")
+    return po
+
+@app.post("/api/purchase-orders", response_model=PurchaseOrder, status_code=201)
+def create_purchase_order(request: CreatePurchaseOrderRequest):
+    backlog_item = next((b for b in backlog_items if b["id"] == request.backlog_item_id), None)
+    if not backlog_item:
+        raise HTTPException(status_code=404, detail="Backlog item not found")
+
+    from datetime import datetime
+    new_po = {
+        "id": str(len(purchase_orders) + 1),
+        "backlog_item_id": request.backlog_item_id,
+        "supplier_name": request.supplier_name,
+        "quantity": request.quantity,
+        "unit_cost": request.unit_cost,
+        "expected_delivery_date": request.expected_delivery_date,
+        "status": "Pending",
+        "created_date": datetime.now().isoformat(),
+        "notes": request.notes,
+    }
+    purchase_orders.append(new_po)
+    return new_po
 
 @app.get("/api/demand", response_model=List[DemandForecast])
 def get_demand_forecasts():
