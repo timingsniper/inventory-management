@@ -1,27 +1,27 @@
 <template>
   <div class="reports">
     <div class="page-header">
-      <h2>{{ t('reports.title') }}</h2>
-      <p>{{ t('reports.subtitle') }}</p>
+      <h2>{{ t("reports.title") }}</h2>
+      <p>{{ t("reports.subtitle") }}</p>
     </div>
 
-    <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+    <div v-if="loading" class="loading">{{ t("common.loading") }}</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
       <!-- Quarterly Performance -->
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">{{ t('reports.quarterlyPerformance') }}</h3>
+          <h3 class="card-title">{{ t("reports.quarterlyPerformance") }}</h3>
         </div>
         <div class="table-container">
           <table class="reports-table">
             <thead>
               <tr>
-                <th>{{ t('reports.table.quarter') }}</th>
-                <th>{{ t('reports.table.totalOrders') }}</th>
-                <th>{{ t('reports.table.totalRevenue') }}</th>
-                <th>{{ t('reports.table.avgOrderValue') }}</th>
-                <th>{{ t('reports.table.fulfillmentRate') }}</th>
+                <th>{{ t("reports.table.quarter") }}</th>
+                <th>{{ t("reports.table.totalOrders") }}</th>
+                <th>{{ t("reports.table.totalRevenue") }}</th>
+                <th>{{ t("reports.table.avgOrderValue") }}</th>
+                <th>{{ t("reports.table.fulfillmentRate") }}</th>
               </tr>
             </thead>
             <tbody>
@@ -46,7 +46,7 @@
       <!-- Monthly Trends Chart -->
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">{{ t('reports.monthlyRevenueTrend') }}</h3>
+          <h3 class="card-title">{{ t("reports.monthlyRevenueTrend") }}</h3>
         </div>
         <div class="chart-container">
           <div class="bar-chart">
@@ -71,17 +71,17 @@
       <!-- Month-over-Month Comparison -->
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">{{ t('reports.monthOverMonthAnalysis') }}</h3>
+          <h3 class="card-title">{{ t("reports.monthOverMonthAnalysis") }}</h3>
         </div>
         <div class="table-container">
           <table class="reports-table">
             <thead>
               <tr>
-                <th>{{ t('reports.table.month') }}</th>
-                <th>{{ t('reports.table.orders') }}</th>
-                <th>{{ t('reports.table.revenue') }}</th>
-                <th>{{ t('reports.table.change') }}</th>
-                <th>{{ t('reports.table.growthRate') }}</th>
+                <th>{{ t("reports.table.month") }}</th>
+                <th>{{ t("reports.table.orders") }}</th>
+                <th>{{ t("reports.table.revenue") }}</th>
+                <th>{{ t("reports.table.change") }}</th>
+                <th>{{ t("reports.table.growthRate") }}</th>
               </tr>
             </thead>
             <tbody>
@@ -138,19 +138,21 @@
       <!-- Summary Stats -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">{{ t('reports.stats.totalRevenueYTD') }}</div>
+          <div class="stat-label">{{ t("reports.stats.totalRevenueYTD") }}</div>
           <div class="stat-value">${{ formatNumber(totalRevenue) }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">{{ t('reports.stats.avgMonthlyRevenue') }}</div>
+          <div class="stat-label">
+            {{ t("reports.stats.avgMonthlyRevenue") }}
+          </div>
           <div class="stat-value">${{ formatNumber(avgMonthlyRevenue) }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">{{ t('reports.stats.totalOrdersYTD') }}</div>
+          <div class="stat-label">{{ t("reports.stats.totalOrdersYTD") }}</div>
           <div class="stat-value">{{ totalOrders }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">{{ t('reports.stats.bestQuarter') }}</div>
+          <div class="stat-label">{{ t("reports.stats.bestQuarter") }}</div>
           <div class="stat-value">{{ bestQuarter }}</div>
         </div>
       </div>
@@ -223,7 +225,10 @@ export default {
     const bestQuarter = computed(() => {
       // Find the quarter with the highest total_revenue
       return quarterlyData.value.reduce(
-        (best, q) => (q.total_revenue > best.revenue ? { name: q.quarter, revenue: q.total_revenue } : best),
+        (best, q) =>
+          q.total_revenue > best.revenue
+            ? { name: q.quarter, revenue: q.total_revenue }
+            : best,
         { name: "", revenue: 0 },
       ).name;
     });
@@ -245,8 +250,18 @@ export default {
       const year = parts[0];
       const month = parts[1];
       const monthNames = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
       ];
       const monthIndex = parseInt(month) - 1;
       return monthNames[monthIndex] + " " + year;
